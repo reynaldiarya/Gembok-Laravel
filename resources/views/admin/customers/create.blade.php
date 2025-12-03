@@ -122,6 +122,40 @@
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        <!-- PPPoE Section -->
+                        <div class="md:col-span-2 border-t pt-6 mt-2">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-network-wired mr-2 text-cyan-600"></i>PPPoE Configuration (Mikrotik)
+                            </h3>
+                        </div>
+
+                        <!-- PPPoE Username -->
+                        <div>
+                            <label for="pppoe_username" class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-user-shield mr-2 text-cyan-600"></i>PPPoE Username
+                            </label>
+                            <input type="text" name="pppoe_username" id="pppoe_username" value="{{ old('pppoe_username') }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('pppoe_username') border-red-500 @enderror"
+                                placeholder="Contoh: pppoe-customer001">
+                            @error('pppoe_username')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- PPPoE Password -->
+                        <div>
+                            <label for="pppoe_password" class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-key mr-2 text-cyan-600"></i>PPPoE Password
+                            </label>
+                            <input type="text" name="pppoe_password" id="pppoe_password" value="{{ old('pppoe_password') }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('pppoe_password') border-red-500 @enderror"
+                                placeholder="Password untuk koneksi PPPoE">
+                            @error('pppoe_password')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            <p class="mt-1 text-xs text-gray-500">Kosongkan jika tidak menggunakan Mikrotik</p>
+                        </div>
                     </div>
 
                     <!-- Actions -->

@@ -58,11 +58,33 @@ class CustomerController extends Controller
             'address' => 'nullable|string',
             'package_id' => 'nullable|exists:packages,id',
             'status' => 'required|in:active,inactive,suspended',
+            'pppoe_username' => 'nullable|string|max:255',
+            'pppoe_password' => 'nullable|string|max:255',
         ]);
 
         $validated['join_date'] = now();
 
-        \App\Models\Customer::create($validated);
+        $customer = \App\Models\Customer::create($validated);
+
+        // Sync to Mikrotik if PPPoE credentials provided
+        if (!empty($validated['pppoe_username']) && $validated['status'] === 'active') {
+            try {
+                $mikrotik = app(MikrotikService::class);
+                if ($mikrotik->isConnected()) {
+                    $package = $customer->package;
+                    $mikrotik->createPPPoESecret([
+                        'username' => $validated['pppoe_username'],
+                        'password' => $validated['pppoe_password'] ?? $validated['pppoe_username'],
+                        'profile' => $package->pppoe_profile ?? 'default',
+                        'comment' => "Customer: {$customer->name} (ID: {$customer->id})",
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Mikrotik sync failed on customer create: ' . $e->getMessage());
+                return redirect()->route('admin.customers.index')
+                    ->with('warning', 'Customer created but Mikrotik sync failed: ' . $e->getMessage());
+            }
+        }
 
         return redirect()->route('admin.customers.index')
             ->with('success', 'Customer created successfully!');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\MikrotikService;
 use Illuminate\Http\Request;
 
 class PackageController extends Controller
@@ -33,10 +34,51 @@ class PackageController extends Controller
         $validated['is_active'] = $request->has('is_active');
         $validated['tax_rate'] = $validated['tax_rate'] ?? 11.0;
 
-        \App\Models\Package::create($validated);
+        $package = \App\Models\Package::create($validated);
+
+        // Sync PPPoE profile to Mikrotik if profile name provided
+        if (!empty($validated['pppoe_profile'])) {
+            try {
+                $mikrotik = app(MikrotikService::class);
+                if ($mikrotik->isConnected()) {
+                    // Parse speed for rate limit (e.g., "10M/10M" or "10 Mbps")
+                    $rateLimit = $this->parseSpeedToRateLimit($validated['speed'] ?? '');
+                    
+                    $mikrotik->createPPPoEProfile([
+                        'name' => $validated['pppoe_profile'],
+                        'rate_limit' => $rateLimit,
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Mikrotik profile sync failed: ' . $e->getMessage());
+            }
+        }
 
         return redirect()->route('admin.packages.index')
             ->with('success', 'Package created successfully!');
+    }
+
+    /**
+     * Parse speed string to Mikrotik rate limit format
+     */
+    private function parseSpeedToRateLimit($speed)
+    {
+        if (empty($speed)) {
+            return null;
+        }
+        
+        // If already in format like "10M/10M", return as is
+        if (preg_match('/^\d+[KMG]\/\d+[KMG]$/i', $speed)) {
+            return $speed;
+        }
+        
+        // Extract number from string like "10 Mbps", "20Mbps", "10M"
+        if (preg_match('/(\d+)\s*[Mm]/', $speed, $matches)) {
+            $mbps = $matches[1];
+            return "{$mbps}M/{$mbps}M";
+        }
+        
+        return null;
     }
 
     public function show(\App\Models\Package $package)
