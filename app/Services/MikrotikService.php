@@ -5,17 +5,42 @@ namespace App\Services;
 use RouterOS\Client;
 use RouterOS\Query;
 use Illuminate\Support\Facades\Log;
+use App\Models\IntegrationSetting;
 
 class MikrotikService
 {
     protected $client;
     protected $connected = false;
 
-    public function __construct()
+    public function __construct(array $config = null)
     {
         try {
-            $host = config('services.mikrotik.host');
-            $enabled = config('services.mikrotik.enabled', false);
+            // If config provided directly (for testing), use it
+            if ($config) {
+                $host = $config['host'] ?? null;
+                $username = $config['username'] ?? null;
+                $password = $config['password'] ?? null;
+                $port = (int) ($config['port'] ?? 8728);
+                $enabled = true;
+            } else {
+                // Try to get config from database first
+                $setting = IntegrationSetting::mikrotik();
+                
+                if ($setting && $setting->isActive()) {
+                    $host = $setting->getConfig('host');
+                    $username = $setting->getConfig('username');
+                    $password = $setting->getConfig('password');
+                    $port = (int) $setting->getConfig('port', 8728);
+                    $enabled = true;
+                } else {
+                    // Fallback to config file
+                    $host = config('services.mikrotik.host');
+                    $username = config('services.mikrotik.username');
+                    $password = config('services.mikrotik.password');
+                    $port = (int) config('services.mikrotik.port', 8728);
+                    $enabled = config('services.mikrotik.enabled', false);
+                }
+            }
             
             // Skip connection if not enabled or host not configured
             if (!$enabled || empty($host)) {
@@ -25,14 +50,35 @@ class MikrotikService
             
             $this->client = new Client([
                 'host' => $host,
-                'user' => config('services.mikrotik.username'),
-                'pass' => config('services.mikrotik.password'),
-                'port' => (int) config('services.mikrotik.port', 8728),
+                'user' => $username,
+                'pass' => $password,
+                'port' => $port,
             ]);
             $this->connected = true;
         } catch (\Exception $e) {
             Log::error('Mikrotik connection failed: ' . $e->getMessage());
             $this->connected = false;
+        }
+    }
+    
+    public function connect()
+    {
+        return $this->connected;
+    }
+    
+    public function getSystemIdentity()
+    {
+        if (!$this->connected) {
+            return null;
+        }
+
+        try {
+            $query = new Query('/system/identity/print');
+            $result = $this->client->query($query)->read();
+            return $result[0]['name'] ?? null;
+        } catch (\Exception $e) {
+            Log::error('Failed to get system identity: ' . $e->getMessage());
+            return null;
         }
     }
 

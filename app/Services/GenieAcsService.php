@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\IntegrationSetting;
 
 class GenieAcsService
 {
@@ -13,9 +14,19 @@ class GenieAcsService
 
     public function __construct()
     {
-        $this->baseUrl = config('services.genieacs.url');
-        $this->username = config('services.genieacs.username');
-        $this->password = config('services.genieacs.password');
+        // Try to get config from database first
+        $setting = IntegrationSetting::genieacs();
+        
+        if ($setting && $setting->isActive()) {
+            $this->baseUrl = $setting->getConfig('url');
+            $this->username = $setting->getConfig('username');
+            $this->password = $setting->getConfig('password');
+        } else {
+            // Fallback to config file
+            $this->baseUrl = config('services.genieacs.url');
+            $this->username = config('services.genieacs.username');
+            $this->password = config('services.genieacs.password');
+        }
     }
 
     protected function request($method, $endpoint, $data = [])

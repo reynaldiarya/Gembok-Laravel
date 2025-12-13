@@ -4,24 +4,46 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\IntegrationSetting;
 
 class RadiusService
 {
     protected $connection;
     protected $enabled;
+    protected $nasSecret;
 
     public function __construct()
     {
-        $this->enabled = config('services.radius.enabled', false);
+        // Try to get config from database first
+        $setting = IntegrationSetting::radius();
+        
+        if ($setting && $setting->isActive()) {
+            $host = $setting->getConfig('host');
+            $port = $setting->getConfig('port', 3306);
+            $database = $setting->getConfig('database', 'radius');
+            $username = $setting->getConfig('username');
+            $password = $setting->getConfig('password');
+            $this->nasSecret = $setting->getConfig('nas_secret', 'testing123');
+            $this->enabled = true;
+        } else {
+            // Fallback to config file
+            $host = config('services.radius.host', '127.0.0.1');
+            $port = config('services.radius.port', 3306);
+            $database = config('services.radius.database', 'radius');
+            $username = config('services.radius.username', 'radius');
+            $password = config('services.radius.password', '');
+            $this->nasSecret = config('services.radius.nas_secret', 'testing123');
+            $this->enabled = config('services.radius.enabled', false);
+        }
         
         if ($this->enabled) {
             config(['database.connections.radius' => [
                 'driver' => 'mysql',
-                'host' => config('services.radius.host', '127.0.0.1'),
-                'port' => config('services.radius.port', 3306),
-                'database' => config('services.radius.database', 'radius'),
-                'username' => config('services.radius.username', 'radius'),
-                'password' => config('services.radius.password', ''),
+                'host' => $host,
+                'port' => $port,
+                'database' => $database,
+                'username' => $username,
+                'password' => $password,
                 'charset' => 'utf8mb4',
                 'collation' => 'utf8mb4_unicode_ci',
             ]]);
@@ -219,7 +241,7 @@ class RadiusService
 
             // Send CoA disconnect via radclient (requires shell access)
             $nasIp = $session->nasipaddress;
-            $secret = config('services.radius.nas_secret', 'testing123');
+            $secret = $this->nasSecret;
             $sessionId = $session->acctsessionid;
 
             $command = "echo 'User-Name={$username},Acct-Session-Id={$sessionId}' | radclient -x {$nasIp}:3799 disconnect {$secret}";

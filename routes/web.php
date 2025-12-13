@@ -220,6 +220,39 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/{order}/confirm-payment', [\App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('confirm-payment');
             Route::post('/{order}/complete', [\App\Http\Controllers\Admin\OrderController::class, 'complete'])->name('complete');
         });
+        
+        // Integration Settings (GUI)
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/integrations', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'index'])->name('integrations');
+            
+            // Mikrotik
+            Route::get('/mikrotik', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'mikrotik'])->name('mikrotik');
+            Route::post('/mikrotik', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveMikrotik'])->name('mikrotik.save');
+            Route::post('/mikrotik/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testMikrotik'])->name('mikrotik.test');
+            
+            // RADIUS
+            Route::get('/radius', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'radius'])->name('radius');
+            Route::post('/radius', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveRadius'])->name('radius.save');
+            Route::post('/radius/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testRadius'])->name('radius.test');
+            
+            // GenieACS
+            Route::get('/genieacs', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'genieacs'])->name('genieacs');
+            Route::post('/genieacs', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveGenieacs'])->name('genieacs.save');
+            Route::post('/genieacs/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testGenieacs'])->name('genieacs.test');
+            
+            // WhatsApp
+            Route::get('/whatsapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'whatsapp'])->name('whatsapp');
+            Route::post('/whatsapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveWhatsapp'])->name('whatsapp.save');
+            Route::post('/whatsapp/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testWhatsapp'])->name('whatsapp.test');
+            
+            // Midtrans
+            Route::get('/midtrans', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'midtrans'])->name('midtrans');
+            Route::post('/midtrans', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveMidtrans'])->name('midtrans.save');
+            
+            // Xendit
+            Route::get('/xendit', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'xendit'])->name('xendit');
+            Route::post('/xendit', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveXendit'])->name('xendit.save');
+        });
     });
 });
 

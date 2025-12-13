@@ -182,7 +182,13 @@
             <span>API Docs</span>
         </a>
         
-        <a href="{{ route('admin.settings') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.settings') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+        <a href="{{ route('admin.settings.integrations') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.settings.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-plug w-5 mr-3"></i>
+            <span>Integrasi</span>
+            <span class="ml-auto text-xs px-2 py-0.5 bg-cyan-500/30 text-cyan-300 rounded">GUI</span>
+        </a>
+        
+        <a href="{{ route('admin.settings') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.settings') && !request()->routeIs('admin.settings.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
             <i class="fas fa-cog w-5 mr-3"></i>
             <span>Settings</span>
         </a>
