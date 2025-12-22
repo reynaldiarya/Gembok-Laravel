@@ -1,5 +1,5 @@
 <!-- Top Bar -->
-<div class="sticky top-0 z-40 bg-white shadow-md lg:ml-64">
+<div class="sticky top-0 z-40 bg-white shadow-md">
     <div class="flex items-center justify-between h-16 px-6">
         <!-- Mobile Menu Button -->
         <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-gray-600 hover:text-gray-900">
@@ -14,7 +14,7 @@
         </div>
         
         <!-- Right Side -->
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-4 ml-auto">
             <!-- Language Switcher -->
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" class="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border rounded-lg hover:bg-gray-50 transition">
