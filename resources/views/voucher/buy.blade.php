@@ -34,25 +34,27 @@
         </div>
 
         <!-- Voucher Packages -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
             @forelse($packages ?? [] as $package)
             <div class="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden hover:border-cyan-500 transition cursor-pointer"
                  :class="{ 'ring-2 ring-cyan-500': selectedPackage == {{ $package->id }} }"
-                 @click="selectPackage({{ $package->id }}, {{ $package->customer_price }}, '{{ $package->name }}')">
+                 @click="selectPackage({{ $package->id }}, {{ $package->customer_price }}, '{{ $package->package_name }}')">
                 <div class="bg-gradient-to-r from-cyan-600 to-blue-600 p-4 text-center">
-                    <h3 class="text-xl font-bold text-white">{{ $package->name }}</h3>
-                    <p class="text-cyan-100">{{ $package->duration }} Hari</p>
+                    <h3 class="text-lg font-bold text-white">{{ $package->package_name }}</h3>
+                    <p class="text-cyan-100 text-sm">{{ $package->duration }} Jam</p>
                 </div>
-                <div class="p-6 text-center">
+                <div class="p-5 text-center">
                     <div class="mb-4">
-                        <span class="text-3xl font-bold text-white">Rp {{ number_format($package->customer_price, 0, ',', '.') }}</span>
+                        <span class="text-2xl font-bold text-white">Rp {{ number_format($package->customer_price, 0, ',', '.') }}</span>
                     </div>
-                    <ul class="text-cyan-200 text-sm space-y-2 mb-6">
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Speed: {{ $package->speed ?? 'Unlimited' }}</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Kuota: {{ $package->quota ?? 'Unlimited' }}</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Aktif {{ $package->duration }} hari</li>
+                    <ul class="text-cyan-200 text-sm space-y-2 mb-4">
+                        <li><i class="fas fa-clock text-cyan-400 mr-2"></i>Durasi: {{ $package->duration }} Jam</li>
+                        <li><i class="fas fa-wifi text-cyan-400 mr-2"></i>Akses Internet</li>
+                        @if($package->description)
+                        <li><i class="fas fa-info-circle text-cyan-400 mr-2"></i>{{ $package->description }}</li>
+                        @endif
                     </ul>
-                    <button class="w-full py-3 rounded-lg font-semibold transition"
+                    <button class="w-full py-2.5 rounded-lg font-semibold transition text-sm"
                             :class="selectedPackage == {{ $package->id }} ? 'bg-cyan-500 text-white' : 'bg-white/20 text-white hover:bg-white/30'">
                         <span x-show="selectedPackage != {{ $package->id }}">Pilih Paket</span>
                         <span x-show="selectedPackage == {{ $package->id }}"><i class="fas fa-check mr-1"></i> Dipilih</span>
@@ -60,7 +62,7 @@
                 </div>
             </div>
             @empty
-            <div class="col-span-3 text-center py-12">
+            <div class="col-span-full text-center py-12">
                 <i class="fas fa-ticket text-6xl text-cyan-500/50 mb-4"></i>
                 <p class="text-cyan-200">Belum ada paket voucher tersedia</p>
             </div>

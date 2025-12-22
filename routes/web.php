@@ -344,7 +344,8 @@ Route::prefix('customer')->name('customer.')->group(function () {
 // Public Voucher Purchase
 Route::prefix('voucher')->name('voucher.')->group(function () {
     Route::get('/buy', function () {
-        return view('voucher.buy');
+        $packages = \App\Models\VoucherPricing::where('is_active', true)->orderBy('duration')->get();
+        return view('voucher.buy', compact('packages'));
     })->name('buy');
     Route::post('/purchase', [VoucherController::class, 'purchase'])->name('purchase');
     Route::get('/success/{id}', [VoucherController::class, 'success'])->name('success');
