@@ -133,6 +133,29 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/test-connection', [\App\Http\Controllers\Admin\MikrotikController::class, 'testConnection'])->name('test');
         });
         
+        // OLT Management
+        Route::prefix('olt')->name('olt.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\OltController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\OltController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\OltController::class, 'store'])->name('store');
+            Route::get('/{olt}', [\App\Http\Controllers\Admin\OltController::class, 'show'])->name('show');
+            Route::get('/{olt}/edit', [\App\Http\Controllers\Admin\OltController::class, 'edit'])->name('edit');
+            Route::put('/{olt}', [\App\Http\Controllers\Admin\OltController::class, 'update'])->name('update');
+            Route::delete('/{olt}', [\App\Http\Controllers\Admin\OltController::class, 'destroy'])->name('destroy');
+            Route::post('/{olt}/test', [\App\Http\Controllers\Admin\OltController::class, 'testConnection'])->name('test');
+            Route::post('/{olt}/sync', [\App\Http\Controllers\Admin\OltController::class, 'sync'])->name('sync');
+            
+            // ONU Routes
+            Route::get('/onu/list', [\App\Http\Controllers\Admin\OltController::class, 'onuIndex'])->name('onu.index');
+            Route::get('/onu/create', [\App\Http\Controllers\Admin\OltController::class, 'onuCreate'])->name('onu.create');
+            Route::post('/onu', [\App\Http\Controllers\Admin\OltController::class, 'onuStore'])->name('onu.store');
+            Route::get('/onu/{onu}', [\App\Http\Controllers\Admin\OltController::class, 'onuShow'])->name('onu.show');
+            Route::put('/onu/{onu}', [\App\Http\Controllers\Admin\OltController::class, 'onuUpdate'])->name('onu.update');
+            Route::delete('/onu/{onu}', [\App\Http\Controllers\Admin\OltController::class, 'onuDestroy'])->name('onu.destroy');
+            Route::post('/onu/{onu}/reboot', [\App\Http\Controllers\Admin\OltController::class, 'onuReboot'])->name('onu.reboot');
+            Route::post('/onu/{onu}/status', [\App\Http\Controllers\Admin\OltController::class, 'onuUpdateStatus'])->name('onu.status');
+        });
+        
         // CPE Management (GenieACS)
         Route::prefix('cpe')->name('cpe.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\CpeController::class, 'index'])->name('index');

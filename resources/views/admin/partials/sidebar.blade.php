@@ -70,6 +70,11 @@
         <div class="border-t border-cyan-500/20 my-3"></div>
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Network</p>
         
+        <a href="{{ route('admin.olt.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.olt.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-broadcast-tower w-5 mr-3"></i>
+            <span>OLT Management</span>
+        </a>
+        
         <a href="{{ route('admin.vouchers.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.vouchers.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
             <i class="fas fa-ticket-alt w-5 mr-3"></i>
             <span>Vouchers</span>
