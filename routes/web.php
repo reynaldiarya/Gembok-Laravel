@@ -131,6 +131,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/system-resource', [\App\Http\Controllers\Admin\MikrotikController::class, 'systemResource'])->name('system.resource');
             Route::get('/traffic-stats', [\App\Http\Controllers\Admin\MikrotikController::class, 'trafficStats'])->name('traffic.stats');
             Route::get('/test-connection', [\App\Http\Controllers\Admin\MikrotikController::class, 'testConnection'])->name('test');
+            
+            // Sync Routes
+            Route::prefix('sync')->name('sync.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\MikrotikSyncController::class, 'index'])->name('index');
+                Route::get('/profiles', [\App\Http\Controllers\Admin\MikrotikSyncController::class, 'profiles'])->name('profiles');
+                Route::post('/profiles', [\App\Http\Controllers\Admin\MikrotikSyncController::class, 'syncProfiles'])->name('profiles.save');
+                Route::get('/secrets', [\App\Http\Controllers\Admin\MikrotikSyncController::class, 'previewSecrets'])->name('secrets');
+                Route::post('/secrets', [\App\Http\Controllers\Admin\MikrotikSyncController::class, 'importSecrets'])->name('secrets.import');
+                Route::get('/hotspot', [\App\Http\Controllers\Admin\MikrotikSyncController::class, 'previewHotspot'])->name('hotspot');
+                Route::post('/hotspot', [\App\Http\Controllers\Admin\MikrotikSyncController::class, 'importHotspot'])->name('hotspot.import');
+            });
         });
         
         // OLT Management

@@ -94,9 +94,14 @@
         <div class="border-t border-cyan-500/20 my-3"></div>
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Services</p>
         
-        <a href="{{ route('admin.mikrotik.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.mikrotik.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+        <a href="{{ route('admin.mikrotik.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.mikrotik.index') ? 'bg-white bg-opacity-20 text-white' : '' }}">
             <i class="fas fa-server w-5 mr-3"></i>
             <span>Mikrotik</span>
+        </a>
+        
+        <a href="{{ route('admin.mikrotik.sync.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.mikrotik.sync.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-sync-alt w-5 mr-3"></i>
+            <span>Mikrotik Sync</span>
         </a>
         
         <a href="{{ route('admin.radius.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.radius.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">

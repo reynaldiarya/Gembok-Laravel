@@ -399,4 +399,172 @@ class MikrotikService
             return null;
         }
     }
+
+    // ==================== Sync Methods ====================
+
+    /**
+     * Get all PPPoE Secrets from Mikrotik
+     */
+    public function getPPPoESecrets()
+    {
+        if (!$this->connected) {
+            return [];
+        }
+
+        try {
+            $query = new Query('/ppp/secret/print');
+            $secrets = $this->client->query($query)->read();
+            
+            return collect($secrets)->map(function ($secret) {
+                return [
+                    'id' => $secret['.id'] ?? null,
+                    'name' => $secret['name'] ?? null,
+                    'password' => $secret['password'] ?? null,
+                    'service' => $secret['service'] ?? 'pppoe',
+                    'profile' => $secret['profile'] ?? 'default',
+                    'local_address' => $secret['local-address'] ?? null,
+                    'remote_address' => $secret['remote-address'] ?? null,
+                    'comment' => $secret['comment'] ?? null,
+                    'disabled' => ($secret['disabled'] ?? 'false') === 'true',
+                    'caller_id' => $secret['caller-id'] ?? null,
+                ];
+            })->toArray();
+        } catch (\Exception $e) {
+            Log::error('Failed to get PPPoE secrets: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get all PPPoE Profiles from Mikrotik
+     */
+    public function getPPPoEProfiles()
+    {
+        if (!$this->connected) {
+            return [];
+        }
+
+        try {
+            $query = new Query('/ppp/profile/print');
+            $profiles = $this->client->query($query)->read();
+            
+            return collect($profiles)->map(function ($profile) {
+                return [
+                    'id' => $profile['.id'] ?? null,
+                    'name' => $profile['name'] ?? null,
+                    'local_address' => $profile['local-address'] ?? null,
+                    'remote_address' => $profile['remote-address'] ?? null,
+                    'rate_limit' => $profile['rate-limit'] ?? null,
+                    'parent_queue' => $profile['parent-queue'] ?? null,
+                    'address_list' => $profile['address-list'] ?? null,
+                    'dns_server' => $profile['dns-server'] ?? null,
+                    'only_one' => $profile['only-one'] ?? 'default',
+                ];
+            })->toArray();
+        } catch (\Exception $e) {
+            Log::error('Failed to get PPPoE profiles: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get all Hotspot Users from Mikrotik
+     */
+    public function getHotspotUsers()
+    {
+        if (!$this->connected) {
+            return [];
+        }
+
+        try {
+            $query = new Query('/ip/hotspot/user/print');
+            $users = $this->client->query($query)->read();
+            
+            return collect($users)->map(function ($user) {
+                return [
+                    'id' => $user['.id'] ?? null,
+                    'name' => $user['name'] ?? null,
+                    'password' => $user['password'] ?? null,
+                    'profile' => $user['profile'] ?? 'default',
+                    'limit_uptime' => $user['limit-uptime'] ?? null,
+                    'limit_bytes_total' => $user['limit-bytes-total'] ?? null,
+                    'limit_bytes_in' => $user['limit-bytes-in'] ?? null,
+                    'limit_bytes_out' => $user['limit-bytes-out'] ?? null,
+                    'comment' => $user['comment'] ?? null,
+                    'disabled' => ($user['disabled'] ?? 'false') === 'true',
+                    'mac_address' => $user['mac-address'] ?? null,
+                    'server' => $user['server'] ?? 'all',
+                ];
+            })->toArray();
+        } catch (\Exception $e) {
+            Log::error('Failed to get Hotspot users: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get all Hotspot Profiles from Mikrotik
+     */
+    public function getHotspotProfiles()
+    {
+        if (!$this->connected) {
+            return [];
+        }
+
+        try {
+            $query = new Query('/ip/hotspot/user/profile/print');
+            $profiles = $this->client->query($query)->read();
+            
+            return collect($profiles)->map(function ($profile) {
+                return [
+                    'id' => $profile['.id'] ?? null,
+                    'name' => $profile['name'] ?? null,
+                    'rate_limit' => $profile['rate-limit'] ?? null,
+                    'shared_users' => $profile['shared-users'] ?? 1,
+                    'session_timeout' => $profile['session-timeout'] ?? null,
+                    'idle_timeout' => $profile['idle-timeout'] ?? null,
+                    'keepalive_timeout' => $profile['keepalive-timeout'] ?? null,
+                    'address_pool' => $profile['address-pool'] ?? null,
+                ];
+            })->toArray();
+        } catch (\Exception $e) {
+            Log::error('Failed to get Hotspot profiles: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Parse rate limit string to get speed in Mbps
+     * Format: "10M/10M" or "10M" or "10240k/10240k"
+     */
+    public function parseRateLimit($rateLimit)
+    {
+        if (empty($rateLimit)) {
+            return ['upload' => 0, 'download' => 0];
+        }
+
+        $parts = explode('/', $rateLimit);
+        $upload = $this->parseSpeed($parts[0] ?? '0');
+        $download = $this->parseSpeed($parts[1] ?? $parts[0] ?? '0');
+
+        return ['upload' => $upload, 'download' => $download];
+    }
+
+    /**
+     * Parse speed string to Mbps
+     */
+    private function parseSpeed($speed)
+    {
+        $speed = strtolower(trim($speed));
+        
+        if (strpos($speed, 'g') !== false) {
+            return (float) str_replace(['g', 'G'], '', $speed) * 1000;
+        } elseif (strpos($speed, 'm') !== false) {
+            return (float) str_replace(['m', 'M'], '', $speed);
+        } elseif (strpos($speed, 'k') !== false) {
+            return (float) str_replace(['k', 'K'], '', $speed) / 1024;
+        }
+        
+        return (float) $speed / 1048576; // bytes to Mbps
+    }
 }
