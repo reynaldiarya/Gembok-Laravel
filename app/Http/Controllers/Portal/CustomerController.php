@@ -92,7 +92,68 @@ class CustomerController extends Controller
             abort(403);
         }
 
-        return view('customer.invoice-detail', compact('customer', 'invoice'));
+        return view('customer.invoice-show', compact('customer', 'invoice'));
+    }
+
+    /**
+     * Create Duitku payment for customer
+     */
+    public function createDuitkuPayment(Request $request, Invoice $invoice)
+    {
+        $customer = $this->getCustomer();
+        if (!$customer) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+        
+        if ($invoice->customer_id != $customer->id) {
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+        }
+
+        if ($invoice->status === 'paid') {
+            return response()->json(['success' => false, 'message' => 'Invoice sudah dibayar']);
+        }
+
+        $request->validate([
+            'payment_method' => 'required|string',
+        ]);
+
+        $duitku = app(\App\Services\DuitkuService::class);
+        
+        if (!$duitku->isEnabled()) {
+            return response()->json(['success' => false, 'message' => 'Pembayaran online tidak tersedia']);
+        }
+
+        $orderId = 'INV-' . $invoice->id . '-' . time();
+
+        $result = $duitku->createTransaction([
+            'order_id' => $orderId,
+            'amount' => (int) $invoice->total_amount,
+            'payment_method' => $request->payment_method,
+            'product_details' => 'Pembayaran ' . $invoice->invoice_number,
+            'customer_name' => $customer->name ?? 'Customer',
+            'customer_email' => $customer->email ?? '',
+            'customer_phone' => $customer->phone ?? '',
+            'return_url' => route('customer.invoices.show', $invoice->id),
+        ]);
+
+        if ($result['success']) {
+            $invoice->update([
+                'payment_reference' => $result['reference'],
+                'payment_method' => 'duitku_' . $request->payment_method,
+                'payment_url' => $result['payment_url'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'payment_url' => $result['payment_url'],
+                'reference' => $result['reference'],
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => $result['message'] ?? 'Gagal membuat pembayaran',
+        ]);
     }
 
     public function payments()

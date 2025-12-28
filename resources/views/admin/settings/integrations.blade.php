@@ -247,6 +247,35 @@
                 </div>
             </div>
             
+            <!-- Duitku -->
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 overflow-hidden">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="h-12 w-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-credit-card text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Duitku</h3>
+                                <p class="text-sm text-gray-400">Payment Gateway</p>
+                            </div>
+                        </div>
+                        @php $duitkuEnabled = \App\Models\AppSetting::getValue('duitku_enabled', 'false') === 'true'; @endphp
+                        @if($duitkuEnabled)
+                            <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">Aktif</span>
+                        @else
+                            <span class="px-2 py-1 bg-gray-500/20 text-gray-400 text-xs rounded-full">Nonaktif</span>
+                        @endif
+                    </div>
+                    
+                    <p class="text-sm text-gray-500 mb-4">QRIS, VA, E-Wallet, Retail</p>
+                    
+                    <a href="{{ route('admin.settings.duitku') }}" class="block w-full text-center py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition">
+                        <i class="fas fa-cog mr-2"></i>Konfigurasi
+                    </a>
+                </div>
+            </div>
+            
         </div>
         
         <!-- Info -->

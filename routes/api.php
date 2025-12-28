@@ -25,6 +25,9 @@ Route::prefix('webhooks')->group(function () {
     Route::post('/xendit', [PaymentWebhookController::class, 'xendit']);
 });
 
+// Duitku Callback
+Route::post('/duitku/callback', [\App\Http\Controllers\Api\DuitkuCallbackController::class, 'callback']);
+
 // Payment Callbacks
 Route::prefix('payment')->group(function () {
     Route::get('/finish', fn(Request $r) => redirect()->route('payment.success', ['order_id' => $r->order_id]));

@@ -290,7 +290,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // Xendit
             Route::get('/xendit', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'xendit'])->name('xendit');
             Route::post('/xendit', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveXendit'])->name('xendit.save');
+            
+            // Duitku
+            Route::get('/duitku', [\App\Http\Controllers\Admin\DuitkuController::class, 'settings'])->name('duitku');
+            Route::post('/duitku', [\App\Http\Controllers\Admin\DuitkuController::class, 'saveSettings'])->name('duitku.save');
+            Route::post('/duitku/test', [\App\Http\Controllers\Admin\DuitkuController::class, 'testConnection'])->name('duitku.test');
         });
+        
+        // Duitku Payment
+        Route::post('/duitku/create-payment/{invoice}', [\App\Http\Controllers\Admin\DuitkuController::class, 'createPayment'])->name('duitku.create-payment');
+        Route::post('/duitku/send-link/{invoice}', [\App\Http\Controllers\Admin\DuitkuController::class, 'sendPaymentLink'])->name('duitku.send-link');
+        Route::get('/duitku/check-status', [\App\Http\Controllers\Admin\DuitkuController::class, 'checkStatus'])->name('duitku.check-status');
     });
 });
 
@@ -367,6 +377,7 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/invoices/{invoice}', [\App\Http\Controllers\Portal\CustomerController::class, 'showInvoice'])->name('invoices.show');
     Route::get('/payments', [\App\Http\Controllers\Portal\CustomerController::class, 'payments'])->name('payments');
     Route::post('/pay/{invoice}', [\App\Http\Controllers\Portal\CustomerController::class, 'pay'])->name('pay');
+    Route::post('/duitku/create-payment/{invoice}', [\App\Http\Controllers\Portal\CustomerController::class, 'createDuitkuPayment'])->name('duitku.create-payment');
     Route::get('/profile', [\App\Http\Controllers\Portal\CustomerController::class, 'profile'])->name('profile');
     Route::post('/profile', [\App\Http\Controllers\Portal\CustomerController::class, 'updateProfile'])->name('profile.update');
     Route::get('/support', [\App\Http\Controllers\Portal\CustomerController::class, 'support'])->name('support');

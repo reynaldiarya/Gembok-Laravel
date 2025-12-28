@@ -15,18 +15,22 @@ class Invoice extends Model
         'status',
         'due_date',
         'paid_date',
+        'paid_at',
         'invoice_number',
         'invoice_type',
         'payment_gateway',
         'payment_order_id',
         'transaction_id',
         'payment_method',
+        'payment_reference',
+        'payment_url',
         'collected_by',
     ];
 
     protected $casts = [
         'due_date' => 'date',
         'paid_date' => 'date',
+        'paid_at' => 'datetime',
         'amount' => 'integer',
         'tax_amount' => 'integer',
     ];
