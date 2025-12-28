@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\SnmpService;
+use App\Models\NetworkDevice;
 use Illuminate\Http\Request;
 
 class SnmpController extends Controller
@@ -18,7 +19,9 @@ class SnmpController extends Controller
     public function index()
     {
         $enabled = $this->snmp->isEnabled();
-        $devices = $this->getMonitoredDevices();
+        
+        // Get devices from database
+        $devices = NetworkDevice::active()->orderBy('name')->get();
         
         return view('admin.snmp.index', compact('enabled', 'devices'));
     }
@@ -29,11 +32,23 @@ class SnmpController extends Controller
             return back()->with('error', 'SNMP tidak aktif');
         }
 
+        $device = NetworkDevice::where('host', $host)->first();
         $systemInfo = $this->snmp->getSystemInfo($host);
         $interfaces = $this->snmp->getInterfaces($host);
         $resources = $this->snmp->getResourceUsage($host);
 
-        return view('admin.snmp.device', compact('host', 'systemInfo', 'interfaces', 'resources'));
+        // Update device status
+        if ($device) {
+            $online = !isset($systemInfo['error']);
+            $device->update([
+                'status' => $online ? 'online' : 'offline',
+                'last_check' => now(),
+                'cpu_usage' => $resources['cpu_usage'] ?? null,
+                'memory_usage' => $resources['memory_percent'] ?? null,
+            ]);
+        }
+
+        return view('admin.snmp.device', compact('host', 'device', 'systemInfo', 'interfaces', 'resources'));
     }
 
     public function traffic(Request $request)
@@ -54,9 +69,14 @@ class SnmpController extends Controller
         $host = $request->get('host');
         $result = $this->snmp->ping($host);
         
+        // Update device status in database
+        NetworkDevice::where('host', $host)->update([
+            'status' => $result ? 'online' : 'offline',
+            'last_check' => now(),
+        ]);
+        
         return response()->json(['online' => $result]);
     }
-
 
     public function storeDevice(Request $request)
     {
@@ -64,29 +84,34 @@ class SnmpController extends Controller
             'name' => 'required|string|max:100',
             'host' => 'required|ip',
             'community' => 'nullable|string|max:50',
-            'type' => 'required|in:router,switch,olt,server,other',
+            'type' => 'required|in:router,switch,olt,server,ap,other',
+            'location' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
-        // Store in settings or database
-        $devices = $this->getMonitoredDevices();
-        $devices[] = [
-            'id' => uniqid(),
+        // Check if host already exists
+        if (NetworkDevice::where('host', $request->host)->exists()) {
+            return back()->with('error', 'IP address sudah terdaftar')->withInput();
+        }
+
+        NetworkDevice::create([
             'name' => $request->name,
             'host' => $request->host,
-            'community' => $request->community ?? config('services.snmp.community'),
+            'community' => $request->community ?? 'public',
             'type' => $request->type,
-            'created_at' => now()->toDateTimeString(),
-        ];
-
-        $this->saveMonitoredDevices($devices);
+            'location' => $request->location,
+            'description' => $request->description,
+            'is_active' => true,
+            'snmp_enabled' => true,
+        ]);
 
         return back()->with('success', 'Perangkat berhasil ditambahkan');
     }
 
     public function deleteDevice($id)
     {
-        $devices = collect($this->getMonitoredDevices())->filter(fn($d) => $d['id'] !== $id)->values()->all();
-        $this->saveMonitoredDevices($devices);
+        $device = NetworkDevice::findOrFail($id);
+        $device->delete();
 
         return back()->with('success', 'Perangkat berhasil dihapus');
     }
@@ -97,14 +122,23 @@ class SnmpController extends Controller
             return view('admin.snmp.dashboard', ['enabled' => false, 'devices' => []]);
         }
 
-        $devices = $this->getMonitoredDevices();
+        $devices = NetworkDevice::active()->get();
         $deviceStatus = [];
 
         foreach ($devices as $device) {
+            $online = $this->snmp->ping($device->host);
+            $system = $online ? $this->snmp->getSystemInfo($device->host) : null;
+            
+            // Update device status
+            $device->update([
+                'status' => $online ? 'online' : 'offline',
+                'last_check' => now(),
+            ]);
+
             $deviceStatus[] = [
                 'device' => $device,
-                'online' => $this->snmp->ping($device['host']),
-                'system' => $this->snmp->getSystemInfo($device['host']),
+                'online' => $online,
+                'system' => $system,
             ];
         }
 
@@ -112,19 +146,5 @@ class SnmpController extends Controller
             'enabled' => true,
             'devices' => $deviceStatus,
         ]);
-    }
-
-    protected function getMonitoredDevices(): array
-    {
-        $path = storage_path('app/snmp_devices.json');
-        if (file_exists($path)) {
-            return json_decode(file_get_contents($path), true) ?? [];
-        }
-        return [];
-    }
-
-    protected function saveMonitoredDevices(array $devices): void
-    {
-        file_put_contents(storage_path('app/snmp_devices.json'), json_encode($devices, JSON_PRETTY_PRINT));
     }
 }

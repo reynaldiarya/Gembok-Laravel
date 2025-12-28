@@ -236,6 +236,25 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::delete('/devices/{id}', [\App\Http\Controllers\Admin\SnmpController::class, 'deleteDevice'])->name('devices.delete');
         });
         
+        // IP Monitor
+        Route::prefix('ip-monitor')->name('ip-monitor.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\IpMonitorController::class, 'index'])->name('index');
+            Route::get('/dashboard', [\App\Http\Controllers\Admin\IpMonitorController::class, 'dashboard'])->name('dashboard');
+            Route::get('/alerts', [\App\Http\Controllers\Admin\IpMonitorController::class, 'alerts'])->name('alerts');
+            Route::post('/alerts/read-all', [\App\Http\Controllers\Admin\IpMonitorController::class, 'markAllAlertsRead'])->name('alerts.read-all');
+            Route::post('/alerts/{alert}/read', [\App\Http\Controllers\Admin\IpMonitorController::class, 'markAlertRead'])->name('alert.read');
+            Route::get('/create', [\App\Http\Controllers\Admin\IpMonitorController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\IpMonitorController::class, 'store'])->name('store');
+            Route::post('/import-customers', [\App\Http\Controllers\Admin\IpMonitorController::class, 'importCustomers'])->name('import-customers');
+            Route::post('/ping-all', [\App\Http\Controllers\Admin\IpMonitorController::class, 'pingAll'])->name('ping-all');
+            Route::get('/{ipMonitor}', [\App\Http\Controllers\Admin\IpMonitorController::class, 'show'])->name('show');
+            Route::get('/{ipMonitor}/edit', [\App\Http\Controllers\Admin\IpMonitorController::class, 'edit'])->name('edit');
+            Route::put('/{ipMonitor}', [\App\Http\Controllers\Admin\IpMonitorController::class, 'update'])->name('update');
+            Route::delete('/{ipMonitor}', [\App\Http\Controllers\Admin\IpMonitorController::class, 'destroy'])->name('destroy');
+            Route::post('/{ipMonitor}/ping', [\App\Http\Controllers\Admin\IpMonitorController::class, 'ping'])->name('ping');
+            Route::post('/{ipMonitor}/toggle', [\App\Http\Controllers\Admin\IpMonitorController::class, 'toggleActive'])->name('toggle');
+        });
+        
         // CRM & Accounting Integration
         Route::prefix('integration')->name('integration.')->group(function () {
             Route::get('/crm', [\App\Http\Controllers\Admin\IntegrationController::class, 'crm'])->name('crm');
