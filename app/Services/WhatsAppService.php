@@ -79,7 +79,7 @@ class WhatsAppService
         $message .= "📅 *Jatuh Tempo:* " . ($invoice->due_date ? $invoice->due_date->format('d M Y') : '-') . "\n\n";
         $message .= "Silakan lakukan pembayaran sebelum jatuh tempo.\n\n";
         $message .= "Terima kasih,\n";
-        $message .= "*" . config('app.name') . "*";
+        $message .= "*" . companyName() . "*";
 
         $result = $this->send($customer->phone, $message);
         $this->logMessage($customer->phone, 'invoice', $message, $result, $customer->id, $invoice->id);
@@ -97,7 +97,7 @@ class WhatsAppService
         $message .= "💰 *Jumlah:* Rp " . number_format($invoice->amount, 0, ',', '.') . "\n";
         $message .= "📅 *Tanggal Bayar:* " . ($invoice->paid_date ? $invoice->paid_date->format('d M Y') : now()->format('d M Y')) . "\n\n";
         $message .= "Terima kasih atas pembayaran Anda.\n\n";
-        $message .= "*" . config('app.name') . "*";
+        $message .= "*" . companyName() . "*";
 
         return $this->send($customer->phone, $message);
     }
@@ -121,7 +121,7 @@ class WhatsAppService
         $message .= "2. Buka browser\n";
         $message .= "3. Masukkan username & password\n\n";
         $message .= "Terima kasih!\n";
-        $message .= "*" . config('app.name') . "*";
+        $message .= "*" . companyName() . "*";
 
         return $this->send($phone, $message);
     }
@@ -138,7 +138,7 @@ class WhatsAppService
         $message .= "💰 *Total:* Rp " . number_format($invoice->amount, 0, ',', '.') . "\n";
         $message .= "📅 *Jatuh Tempo:* " . ($invoice->due_date ? $invoice->due_date->format('d M Y') : '-') . "\n\n";
         $message .= "Mohon segera lakukan pembayaran untuk menghindari pemutusan layanan.\n\n";
-        $message .= "*" . config('app.name') . "*";
+        $message .= "*" . companyName() . "*";
 
         $result = $this->send($customer->phone, $message);
         $this->logMessage($customer->phone, 'reminder', $message, $result, $customer->id, $invoice->id);
@@ -154,7 +154,7 @@ class WhatsAppService
         $message .= "Halo *{$customer->name}*,\n\n";
         $message .= "Layanan internet Anda telah ditangguhkan karena tunggakan pembayaran.\n\n";
         $message .= "Silakan hubungi kami atau lakukan pembayaran untuk mengaktifkan kembali layanan Anda.\n\n";
-        $message .= "*" . config('app.name') . "*";
+        $message .= "*" . companyName() . "*";
 
         $result = $this->send($customer->phone, $message);
         $this->logMessage($customer->phone, 'suspension', $message, $result, $customer->id);

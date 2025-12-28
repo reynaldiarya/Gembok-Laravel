@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pesanan Berhasil - {{ config('app.name') }}</title>
+    <title>Pesanan Berhasil - {{ companyName() }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -54,7 +54,7 @@
                     <div class="bg-white rounded p-3 text-sm">
                         <p><strong>Bank BCA</strong></p>
                         <p>No. Rek: 1234567890</p>
-                        <p>A/N: {{ config('app.name') }}</p>
+                        <p>A/N: {{ companyName() }}</p>
                         <p class="mt-2 font-bold">Jumlah: Rp {{ number_format($order->total_amount, 0, ',', '.') }}</p>
                     </div>
                     <p class="text-xs text-yellow-600 mt-2">

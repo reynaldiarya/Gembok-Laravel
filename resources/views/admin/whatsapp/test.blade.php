@@ -127,7 +127,7 @@ Tagihan internet Anda telah terbit:
 Silakan lakukan pembayaran sebelum jatuh tempo.
 
 Terima kasih,
-*{{ config('app.name') }}*</pre>
+*{{ companyName() }}*</pre>
                             </div>
 
                             <!-- Reminder Template -->
@@ -144,7 +144,7 @@ Tagihan Anda belum dibayar:
 
 Mohon segera lakukan pembayaran untuk menghindari pemutusan layanan.
 
-*{{ config('app.name') }}*</pre>
+*{{ companyName() }}*</pre>
                             </div>
 
                             <!-- Suspension Template -->
@@ -157,7 +157,7 @@ Layanan internet Anda telah ditangguhkan karena tunggakan pembayaran.
 
 Silakan hubungi kami atau lakukan pembayaran untuk mengaktifkan kembali layanan Anda.
 
-*{{ config('app.name') }}*</pre>
+*{{ companyName() }}*</pre>
                             </div>
 
                             <!-- Custom Template -->

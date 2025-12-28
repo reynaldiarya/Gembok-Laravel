@@ -67,7 +67,7 @@ class ReactivatePaidCustomers extends Command
                             $message = "Halo {$customer->name},\n\n";
                             $message .= "Terima kasih atas pembayaran Anda. Layanan internet Anda telah diaktifkan kembali.\n\n";
                             $message .= "Selamat menikmati layanan kami!\n\n";
-                            $message .= "- Tim " . config('app.name');
+                            $message .= "- Tim " . companyName();
 
                             $result = $this->whatsapp->sendMessage($customer->phone, $message);
                             if ($result['success'] ?? false) {

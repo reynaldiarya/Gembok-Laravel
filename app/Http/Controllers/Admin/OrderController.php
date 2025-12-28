@@ -96,7 +96,7 @@ class OrderController extends Controller
             $message .= "Halo *{$order->customer_name}*,\n\n";
             $message .= "Pembayaran untuk pesanan *{$order->order_number}* telah dikonfirmasi.\n\n";
             $message .= "Tim kami akan segera menghubungi Anda untuk jadwal pemasangan.\n\n";
-            $message .= "Terima kasih!\n*" . config('app.name') . "*";
+            $message .= "Terima kasih!\n*" . companyName() . "*";
 
             app(WhatsAppService::class)->send($order->customer_phone, $message);
         } catch (\Exception $e) {
@@ -159,7 +159,7 @@ class OrderController extends Controller
                 $message .= "🔑 Password: `{$password}`\n\n";
                 $message .= "📦 Paket: {$order->package->name}\n";
                 $message .= "⚡ Kecepatan: {$order->package->speed}\n\n";
-                $message .= "Terima kasih telah berlangganan!\n*" . config('app.name') . "*";
+                $message .= "Terima kasih telah berlangganan!\n*" . companyName() . "*";
 
                 app(WhatsAppService::class)->send($customer->phone, $message);
             } catch (\Exception $e) {
@@ -182,14 +182,15 @@ class OrderController extends Controller
 
     protected function notifyCustomer(Order $order, $status)
     {
+        $company = companyName();
         $messages = [
-            'confirmed' => "✅ *Pesanan Dikonfirmasi*\n\nHalo *{$order->customer_name}*,\n\nPesanan Anda *{$order->order_number}* telah dikonfirmasi.\n\nKami akan segera menghubungi Anda untuk jadwal pemasangan.\n\n*" . config('app.name') . "*",
+            'confirmed' => "✅ *Pesanan Dikonfirmasi*\n\nHalo *{$order->customer_name}*,\n\nPesanan Anda *{$order->order_number}* telah dikonfirmasi.\n\nKami akan segera menghubungi Anda untuk jadwal pemasangan.\n\n*{$company}*",
             
-            'scheduled' => "📅 *Jadwal Pemasangan*\n\nHalo *{$order->customer_name}*,\n\nPemasangan dijadwalkan:\n📅 Tanggal: " . ($order->installation_date ? $order->installation_date->format('d M Y') : '-') . "\n⏰ Waktu: {$order->installation_time}\n\nTeknisi kami akan menghubungi Anda.\n\n*" . config('app.name') . "*",
+            'scheduled' => "📅 *Jadwal Pemasangan*\n\nHalo *{$order->customer_name}*,\n\nPemasangan dijadwalkan:\n📅 Tanggal: " . ($order->installation_date ? $order->installation_date->format('d M Y') : '-') . "\n⏰ Waktu: {$order->installation_time}\n\nTeknisi kami akan menghubungi Anda.\n\n*{$company}*",
             
-            'installing' => "🔧 *Pemasangan Dimulai*\n\nHalo *{$order->customer_name}*,\n\nTeknisi kami sedang dalam perjalanan untuk melakukan pemasangan.\n\n*" . config('app.name') . "*",
+            'installing' => "🔧 *Pemasangan Dimulai*\n\nHalo *{$order->customer_name}*,\n\nTeknisi kami sedang dalam perjalanan untuk melakukan pemasangan.\n\n*{$company}*",
             
-            'cancelled' => "❌ *Pesanan Dibatalkan*\n\nHalo *{$order->customer_name}*,\n\nPesanan *{$order->order_number}* telah dibatalkan.\n\nJika ada pertanyaan, silakan hubungi kami.\n\n*" . config('app.name') . "*",
+            'cancelled' => "❌ *Pesanan Dibatalkan*\n\nHalo *{$order->customer_name}*,\n\nPesanan *{$order->order_number}* telah dibatalkan.\n\nJika ada pertanyaan, silakan hubungi kami.\n\n*{$company}*",
         ];
 
         if (isset($messages[$status])) {

@@ -149,7 +149,7 @@ class PaymentController extends Controller
         $message .= "🔗 *Link Pembayaran:*\n{$result['payment_url']}\n\n";
         $message .= "Link ini berlaku selama 24 jam.\n\n";
         $message .= "Terima kasih,\n";
-        $message .= "*" . config('app.name') . "*";
+        $message .= "*" . companyName() . "*";
 
         $waResult = $this->whatsapp->send($customer->phone, $message);
 
