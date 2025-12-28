@@ -67,3 +67,9 @@ Schedule::command('mikrotik:sync-users --update')
     ->hourly()
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/mikrotik.log'));
+
+// Check IP Monitors every 5 minutes
+Schedule::command('ip-monitor:check')
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/ip-monitor.log'));
