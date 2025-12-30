@@ -1,0 +1,17 @@
+includes:
+    - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
+parameters:
+    level: 5
+    paths:
+        - app
+    excludePaths:
+        - vendor
+        - storage
+        - bootstrap/cache
+    checkMissingIterableValueType: false
+    reportUnmatchedIgnoredErrors: false
+    
+    ignoreErrors:
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder::#'
+        - '#Call to an undefined method Illuminate\\Database\\Query\\Builder::#'
